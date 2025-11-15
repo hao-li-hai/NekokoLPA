@@ -17,6 +17,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
       - name: Gradle Cache
         uses: actions/cache@v3
         with:
@@ -27,16 +36,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x android/gradlew
-        working-directory: ./android
+      - name: Grant execute permission for build script
+        run: chmod +x build_for_github.sh
 
       - name: Build with Gradle
-        run: ./gradlew assembleRelease
-        working-directory: ./android
+        run: bash ./build_for_github.sh
 
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: app-release
-          path: android/app/build/outputs/apk/release/app-release.apk
+          path: outputs/apk/*.apk
